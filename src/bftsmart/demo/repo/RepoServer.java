@@ -80,7 +80,7 @@ public class RepoServer extends DefaultSingleRecoverable {
 
                     case XSTART:
                         tid = transLayer.createTransaction();
-                        objOut.writeInt(tid)
+                        objOut.writeInt(tid);
                         hasReply = true;
                         break;
 
