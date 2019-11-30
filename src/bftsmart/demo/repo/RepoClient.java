@@ -12,6 +12,33 @@ while true :
     t.read(k)
     t.write(k,v)
     t.commit()
-    
+
 
 */
+
+
+package bftsmart.demo.map;
+
+
+public class RepoClient {
+    public static void main(String[] args) {
+        if (args.length < 1) {
+            System.out.println("Usage: demo.repo.RepoClient <client id>");
+            System.exit(-1);
+        }
+
+        int clientID = Integer.parseInt(args[0]);
+
+        RepoClientConnector conn = new RepoClientConnector(clientID);
+
+        int tid = conn.transStart();
+        conn.write(tid, 1, 233);
+        conn.transCommit(tid);
+
+        int tid = conn.transStart();
+        conn.write(tid, 1, 333);
+        int d = conn.read(tid, 1);
+        System.out.println(d);
+        conn.transCommit(tid);
+    }
+}

@@ -13,13 +13,15 @@ class RepoTransactionLayer {
     private HashMap<Integer, RepoTransaction> transactions;
     private int lastXID;
 
-    // private RepoExecutor executor;
+    public RepoExecutor executor;
 
 
     public RepoTransactionLayer() {
         lastXID = 1;
 
         transactions = new HashMap<Integer, RepoTransaction>();
+
+        this.executor = new RepoExecutor();
     }
 
 
@@ -52,12 +54,16 @@ class RepoTransactionLayer {
         // int data = executor.read(key);
         // return data;
 
-        return 0;
+        int value = executor.doRead(key);
+
+        return value;
     }
 
 
     public boolean write(int tid, int key, int value) {
         transactions.get(tid).writeToServer(key, value);
+
+        executor.doWrite(key, value);
 
         return true;
     }
@@ -85,5 +91,8 @@ class RepoTransactionLayer {
         //                return False
         // Call executor to do writes
         // return True
+
+
+        return true;
     }
 }
