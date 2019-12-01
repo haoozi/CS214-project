@@ -70,7 +70,11 @@ class RepoTransactionLayer {
 
         }
 
-        int value = executor.doRead(key);
+        Integer value = executor.doRead(key);
+
+        if (value == null) {
+            return 0;
+        }
 
         return value;
     }
@@ -118,6 +122,16 @@ class RepoTransactionLayer {
         //                return False
         // Call executor to do writes
         // return True
+
+        for (int i = 0; i < trans.readHistory.size(); i++) {
+            for (RepoTransaction eachUncommitedTransaction : transactions.values()) {
+                for (int j = 0; j < eachUncommitedTransaction.cachedWrites.size(); j++) {
+                    if (trans.readHistory.get(i).key == eachUncommitedTransaction.cachedWrites.get(j).key) {
+                        canCommit = false;
+                    }
+                }
+            }
+        }
 
 
         if (canCommit) {
