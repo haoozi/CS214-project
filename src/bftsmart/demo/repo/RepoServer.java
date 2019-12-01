@@ -23,13 +23,14 @@ import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
 public class RepoServer extends DefaultSingleRecoverable {
 
     private RepoTransactionLayer transLayer;
+    private Logger logger;
 
 
     public RepoServer(int id) {
         // replicaMap = new TreeMap<>();
+        this.transLayer = new RepoTransactionLayer();
 		logger = Logger.getLogger(RepoServer.class.getName());
 		new ServiceReplica(id, this, this);
-        this.transLayer = new RepoTransactionLayer();
     }
     public static void main(String[] args) {
         if (args.length < 1) {
@@ -48,8 +49,8 @@ public class RepoServer extends DefaultSingleRecoverable {
     	@Override
     	public byte[] appExecuteOrdered(byte[] command, MessageContext msgCtx) {
     		byte[] reply = null;
-    		int key = null;
-    		int value = null;
+    		int key;
+    		int value;
             int tid = 0;
     		boolean hasReply = false;
     		try (ByteArrayInputStream byteIn = new ByteArrayInputStream(command);
@@ -133,8 +134,7 @@ public class RepoServer extends DefaultSingleRecoverable {
     	@Override
     	public byte[] appExecuteUnordered(byte[] command, MessageContext msgCtx) {
     		byte[] reply = null;
-    		K key = null;
-    		V value = null;
+    		int key, value;
     		boolean hasReply = false;
 
     		try (ByteArrayInputStream byteIn = new ByteArrayInputStream(command);

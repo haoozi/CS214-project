@@ -17,7 +17,7 @@ while true :
 */
 
 
-package bftsmart.demo.map;
+package bftsmart.demo.repo;
 
 
 public class RepoClient {
@@ -35,7 +35,7 @@ public class RepoClient {
         conn.write(tid, 1, 233);
         conn.transCommit(tid);
 
-        int tid = conn.transStart();
+        tid = conn.transStart();
         conn.write(tid, 1, 333);
         int d = conn.read(tid, 1);
         System.out.println(d);

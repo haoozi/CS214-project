@@ -13,7 +13,7 @@ class RepoTransactionLayer {
     private HashMap<Integer, RepoTransaction> transactions;
     private int lastXID;
 
-    public RepoExecutor executor;
+    public RepoTransactionExecutor executor;
 
 
     public RepoTransactionLayer() {
@@ -21,7 +21,7 @@ class RepoTransactionLayer {
 
         transactions = new HashMap<Integer, RepoTransaction>();
 
-        this.executor = new RepoExecutor();
+        this.executor = new RepoTransactionExecutor();
     }
 
 
@@ -40,9 +40,9 @@ class RepoTransactionLayer {
     }
 
 
-    public int read(int tid, int key) {
+    public int read(int tid, Integer key) {
 
-        RepoTransaction trans = transantions.get(tid);
+        RepoTransaction trans = this.transactions.get(tid);
 
         trans.readFromServer(key);
 
@@ -60,8 +60,8 @@ class RepoTransactionLayer {
     }
 
 
-    public boolean write(int tid, int key, int value) {
-        transactions.get(tid).writeToServer(key, value);
+    public boolean write(int tid, Integer key, Integer value) {
+        this.transactions.get(tid).writeToServer(key, value);
 
         executor.doWrite(key, value);
 
@@ -71,7 +71,7 @@ class RepoTransactionLayer {
 
     // Atomic
     public boolean abort(int tid) {
-        transactions.remove(tid);
+        this.transactions.remove(tid);
 
         return true;
     }
@@ -79,9 +79,9 @@ class RepoTransactionLayer {
 
     // Atomic
     public boolean commit(int tid) {
-        RepoTransaction trans = transantions.get(tid);
+        RepoTransaction trans = this.transactions.get(tid);
 
-        transactions.remove(tid);
+        this.transactions.remove(tid);
 
         // OCC
 

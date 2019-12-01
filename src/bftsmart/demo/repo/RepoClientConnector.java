@@ -1,5 +1,5 @@
 
-package bftsmart.demo.map;
+package bftsmart.demo.repo;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -15,10 +15,10 @@ import java.util.Set;
 
 import bftsmart.tom.ServiceProxy;
 
-public class RepoClient {
+public class RepoClientConnector {
     ServiceProxy serviceProxy;
 
-    public RepoClient(int clientID) {
+    public RepoClientConnector(int clientID) {
         serviceProxy = new ServiceProxy(clientID);
     }
 
@@ -33,7 +33,7 @@ public class RepoClient {
 
 			byte[] reply = serviceProxy.invokeOrdered(byteOut.toByteArray());
 			if (reply.length == 0)
-				return null;
+				return 0;
 			try (ByteArrayInputStream byteIn = new ByteArrayInputStream(reply);
 					ObjectInput objIn = new ObjectInputStream(byteIn)) {
 				return (int)objIn.readObject();
@@ -42,6 +42,7 @@ public class RepoClient {
 		} catch (IOException | ClassNotFoundException e) {
 			System.out.println("Exception getting transaction ID: " + e.getMessage());
 		}
+        return 0;
     }
 
 
@@ -72,6 +73,8 @@ public class RepoClient {
 		} catch (IOException | ClassNotFoundException e) {
 			System.out.println("Exception getting transaction ID: " + e.getMessage());
 		}
+
+        return false;
     }
 
     public void transAbort(int tid) {
@@ -86,7 +89,7 @@ public class RepoClient {
 
 			serviceProxy.invokeOrdered(byteOut.toByteArray());
 
-		} catch (IOException | ClassNotFoundException e) {
+		} catch (IOException e) {
 			System.out.println("Exception getting transaction ID: " + e.getMessage());
 		}
     }
@@ -104,7 +107,7 @@ public class RepoClient {
 
 			byte[] reply = serviceProxy.invokeOrdered(byteOut.toByteArray());
 			if (reply.length == 0)
-				return null;
+				return 0;
 			try (ByteArrayInputStream byteIn = new ByteArrayInputStream(reply);
 					ObjectInput objIn = new ObjectInputStream(byteIn)) {
 				return (int)objIn.readObject();
@@ -113,6 +116,8 @@ public class RepoClient {
 		} catch (IOException | ClassNotFoundException e) {
 			System.out.println("Exception getting transaction ID: " + e.getMessage());
 		}
+
+        return 0;
     }
 
     public boolean write(int tid, int key, int value) {
@@ -129,10 +134,11 @@ public class RepoClient {
 
             serviceProxy.invokeOrdered(byteOut.toByteArray());
 
-            return true;
-		} catch (IOException | ClassNotFoundException e) {
+		} catch (IOException e) {
 			System.out.println("Exception getting transaction ID: " + e.getMessage());
 		}
+
+        return true;
     }
 
 }

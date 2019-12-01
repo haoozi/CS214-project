@@ -1,7 +1,7 @@
 package bftsmart.demo.repo;
 
 
-
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,7 +18,7 @@ import java.io.ObjectOutputStream;
 
 class RepoTransactionExecutor {
 
-    private Map<int, int> replicaMap;
+    private Map<Integer, Integer> replicaMap;
     private Logger logger;
 
     public RepoTransactionExecutor() {
@@ -26,12 +26,14 @@ class RepoTransactionExecutor {
         logger = Logger.getLogger(RepoTransactionExecutor.class.getName());
     }
 
-    public int doRead(int key) {
+    public Integer doRead(Integer key) {
         return replicaMap.get(key);
     }
 
-    public boolean doWrite(int key, int value) {
+    public boolean doWrite(Integer key, Integer value) {
         replicaMap.put(key, value);
+
+        return true;
     }
 
     public byte[] getSnapshot() {
@@ -49,7 +51,7 @@ class RepoTransactionExecutor {
     public void installSnapshot(byte[] state) {
 		try (ByteArrayInputStream byteIn = new ByteArrayInputStream(state);
 				ObjectInput objIn = new ObjectInputStream(byteIn)) {
-			replicaMap = (Map<K, V>)objIn.readObject();
+			replicaMap = (Map<Integer, Integer>)objIn.readObject();
 		} catch (IOException | ClassNotFoundException e) {
 			logger.log(Level.SEVERE, "Error while installing snapshot", e);
 		}
