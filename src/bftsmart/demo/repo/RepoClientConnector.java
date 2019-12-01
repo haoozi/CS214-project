@@ -23,6 +23,7 @@ public class RepoClientConnector {
     }
 
     public int transStart() {
+        int tid = 0;
         try (ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
 				ObjectOutput objOut = new ObjectOutputStream(byteOut);) {
 
@@ -36,13 +37,14 @@ public class RepoClientConnector {
 				return 0;
 			try (ByteArrayInputStream byteIn = new ByteArrayInputStream(reply);
 					ObjectInput objIn = new ObjectInputStream(byteIn)) {
-				return (int)objIn.readObject();
+				tid = (int)objIn.readObject();
+            return tid;
 			}
 
 		} catch (IOException | ClassNotFoundException e) {
-			System.out.println("Exception getting transaction ID: " + e.getMessage());
+			System.out.println("Exception when XSTART: " + e.getMessage());
 		}
-        return 0;
+        return tid;
     }
 
 
@@ -71,7 +73,7 @@ public class RepoClientConnector {
 			}
 
 		} catch (IOException | ClassNotFoundException e) {
-			System.out.println("Exception getting transaction ID: " + e.getMessage());
+			System.out.println("Exception when XCOMMIT: " + e.getMessage());
 		}
 
         return false;
@@ -90,7 +92,7 @@ public class RepoClientConnector {
 			serviceProxy.invokeOrdered(byteOut.toByteArray());
 
 		} catch (IOException e) {
-			System.out.println("Exception getting transaction ID: " + e.getMessage());
+			System.out.println("Exception when XABORT: " + e.getMessage());
 		}
     }
 
@@ -114,7 +116,7 @@ public class RepoClientConnector {
 			}
 
 		} catch (IOException | ClassNotFoundException e) {
-			System.out.println("Exception getting transaction ID: " + e.getMessage());
+			System.out.println("Exception when READ: " + e.getMessage());
 		}
 
         return 0;
@@ -135,7 +137,7 @@ public class RepoClientConnector {
             serviceProxy.invokeOrdered(byteOut.toByteArray());
 
 		} catch (IOException e) {
-			System.out.println("Exception getting transaction ID: " + e.getMessage());
+			System.out.println("Exception when WRITE: " + e.getMessage());
 		}
 
         return true;

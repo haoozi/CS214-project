@@ -9,6 +9,8 @@ import java.util.ArrayList;
 class RepoTransaction {
 
     int transactionID;
+    ArrayList<actionObject> readHistory;
+    ArrayList<actionObject> cachedWrites;
 
     class actionObject {
         // RepoOperationType type;
@@ -35,11 +37,13 @@ class RepoTransaction {
 
     public RepoTransaction(int tid) {
         this.transactionID = tid;
+
+        this.readHistory = new ArrayList<actionObject>();
+        this.cachedWrites = new ArrayList<actionObject>();
     }
 
 
-    ArrayList<actionObject> readHistory;
-    ArrayList<actionObject> cachedWrites;
+
 
 
     public void readFromServer(int key) {

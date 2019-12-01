@@ -53,6 +53,7 @@ public class RepoServer extends DefaultSingleRecoverable {
     		int value;
             int tid = 0;
     		boolean hasReply = false;
+
     		try (ByteArrayInputStream byteIn = new ByteArrayInputStream(command);
     				ObjectInput objIn = new ObjectInputStream(byteIn);
     				ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
@@ -63,12 +64,15 @@ public class RepoServer extends DefaultSingleRecoverable {
                     case READ:
                         tid = (int)objIn.readObject();
                         key = (int)objIn.readObject();
-                        //value = (Integer)objIn.readObject();
 
                         value = transLayer.read(tid, key);
 
                         hasReply = true;
-                        objOut.writeInt(value);
+                        objOut.writeObject(value);
+
+                        // System.out.format("READ, tid: %d, key: %d, result value: %d\n", tid, key, value);
+
+
                         break;
 
                     case WRITE:
@@ -76,13 +80,19 @@ public class RepoServer extends DefaultSingleRecoverable {
                         key = (int)objIn.readObject();
                         value = (int)objIn.readObject();
 
+                        // System.out.format("WRITE, tid %d, k: %d, v: %d\n", tid, key, value);
+
                         transLayer.write(tid, key, value);
+                        // System.out.println("Complete");
                         break;
 
                     case XSTART:
                         tid = transLayer.createTransaction();
-                        objOut.writeInt(tid);
+                        objOut.writeObject(tid);
                         hasReply = true;
+
+                        // System.out.print("XSTART, tid: ");
+                        // System.out.println(tid);
                         break;
 
                     case XCOMMIT:
@@ -90,16 +100,22 @@ public class RepoServer extends DefaultSingleRecoverable {
                         hasReply = true;
 
                         if (transLayer.commit(tid)) {
-                            objOut.writeInt(1);
+                            objOut.writeObject(1);
                         } else {
-                            objOut.writeInt(0);
+                            objOut.writeObject(0);
                         }
+
+                        // System.out.print("XCOMMIT, tid: ");
+                        // System.out.println(tid);
                         break;
 
                     case XABORT:
                         tid = (int)objIn.readObject();
 
                         transLayer.abort(tid);
+
+                        // System.out.print("XABORT, tid: ");
+                        // System.out.println(tid);
                         break;
 
     			}

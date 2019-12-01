@@ -31,9 +31,14 @@ public class RepoClient {
 
         RepoClientConnector conn = new RepoClientConnector(clientID);
 
+        System.out.println("Getting TID");
         int tid = conn.transStart();
+        System.out.print("TID");
+        System.out.println(tid);
         conn.write(tid, 1, 233);
         conn.transCommit(tid);
+
+        System.out.println("Transaction 1 complete");
 
         tid = conn.transStart();
         conn.write(tid, 1, 333);

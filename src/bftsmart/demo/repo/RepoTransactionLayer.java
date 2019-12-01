@@ -44,15 +44,31 @@ class RepoTransactionLayer {
 
         RepoTransaction trans = this.transactions.get(tid);
 
+        if (trans == null) {
+            System.out.format("Error, tid %d does not exist\n", tid);
+            return 0;
+        }
+
         trans.readFromServer(key);
 
-        // TODO
         // trans.cachedWrites Find actionObject.key == key
         // if found, return data from cachedWrites
         //else
 
         // int data = executor.read(key);
         // return data;
+
+        for (int i = 0; i < trans.cachedWrites.size(); i++) {
+
+            Integer cw_k = trans.cachedWrites.get(i).key;
+
+            if (cw_k == key) {
+                Integer cw_v = trans.cachedWrites.get(i).value;
+
+                return cw_v;
+            }
+
+        }
 
         int value = executor.doRead(key);
 
@@ -61,9 +77,15 @@ class RepoTransactionLayer {
 
 
     public boolean write(int tid, Integer key, Integer value) {
-        this.transactions.get(tid).writeToServer(key, value);
+        RepoTransaction trans = this.transactions.get(tid);
 
-        executor.doWrite(key, value);
+        if (trans == null) {
+            System.out.format("Error, tid %d does not exist\n", tid);
+            return false;
+        }
+        trans.writeToServer(key, value);
+
+        //executor.doWrite(key, value);
 
         return true;
     }
@@ -71,6 +93,8 @@ class RepoTransactionLayer {
 
     // Atomic
     public boolean abort(int tid) {
+
+        // TODO : does tid exist?
         this.transactions.remove(tid);
 
         return true;
@@ -79,6 +103,9 @@ class RepoTransactionLayer {
 
     // Atomic
     public boolean commit(int tid) {
+
+        boolean canCommit = true;
+
         RepoTransaction trans = this.transactions.get(tid);
 
         this.transactions.remove(tid);
@@ -91,6 +118,15 @@ class RepoTransactionLayer {
         //                return False
         // Call executor to do writes
         // return True
+
+
+        if (canCommit) {
+            for (int i = 0; i < trans.cachedWrites.size(); i++) {
+                Integer k = trans.cachedWrites.get(i).key;
+                Integer v = trans.cachedWrites.get(i).value;
+                executor.doWrite(k, v);
+            }
+        }
 
 
         return true;
