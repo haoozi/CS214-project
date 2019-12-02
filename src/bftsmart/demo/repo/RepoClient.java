@@ -33,9 +33,9 @@ public class RepoClient {
 
 
     public int config_transactions = 1000;
-    public int config_transaction_size = 3;
+    public int config_transaction_size = 4;
     public int config_rw_ratio = 95;
-    public int config_print_progress = 2;
+    public int config_print_progress = 10;
 
     public RepoClient(int id) {
         this.clientID = id;
@@ -58,9 +58,12 @@ public class RepoClient {
 
         System.out.println("Start simple benchmark");
 
-        System.out.println("Setting up...");
-        this.setup();
-        System.out.println("Done. Now start benchmark");
+        if (this.clientID == 0) {
+            System.out.println("Setting up...");
+            this.setup();
+            System.out.println("Done. Now start benchmark");
+        }
+
 
         System.out.format("Total transactions: %d\n", config_transactions);
         System.out.format("Transaction size: %d\n", config_transaction_size);
@@ -71,7 +74,7 @@ public class RepoClient {
         for (int i = 0; i < config_transactions; i++) {
             // generate 1 transaction
             int tid = conn.transStart();
-            for (int j = 0; j < config_transaction_size; j++) {
+            for (int j = 0; j < config_transaction_size - 2; j++) {
                 int k = rand.nextInt(1000);
                 int v = rand.nextInt(1000);
 
@@ -87,7 +90,7 @@ public class RepoClient {
 
             conn.transCommit(tid);
 
-            if (i % config_print_progress == 0) {
+            if ((i + 1) % config_print_progress == 0) {
                 System.out.format("\r%d/%d", i, config_transactions);
             }
         }
@@ -105,14 +108,18 @@ public class RepoClient {
     }
 
     public static void main(String[] args) {
-        if (args.length < 1) {
-            System.out.println("Usage: demo.repo.RepoClient <client id>");
+        if (args.length != 4) {
+            System.out.println("Usage: demo.repo.RepoClient <client id> <transactions> <Read ratio> <transaction size>");
             System.exit(-1);
         }
 
         int clientID = Integer.parseInt(args[0]);
 
         RepoClient c = new RepoClient(clientID);
+
+        c.config_transactions = Integer.parseInt(args[1]);
+        c.config_rw_ratio = Integer.parseInt(args[2]);
+        c.config_transaction_size = Integer.parseInt(args[3]);
 
 
         c.run();
